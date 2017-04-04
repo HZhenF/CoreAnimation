@@ -15,13 +15,15 @@
 
 @interface ViewController ()<CAAnimationDelegate>
 
-@property(nonatomic,strong) CALayer *layer;
+@property(nonatomic,strong) CALayer *mylayer;
 
 @property(nonatomic,strong) UIButton *btn;
 
 @property(nonatomic,strong) UIImageView *imageView;
 
 @property(nonatomic,strong) UIImageView *imageView1;
+
+@property(nonatomic,strong) UIImageView *imageView2;
 
 @property(nonatomic,strong) UIButton *btn_left;
 
@@ -61,6 +63,15 @@
     return _btn_left;
 }
 
+-(UIImageView *)imageView2
+{
+    if (!_imageView2) {
+        _imageView2 = [[UIImageView alloc] initWithFrame:CGRectMake(100, 500, 100, 100)];
+        [self.view addSubview:_imageView2];
+    }
+    return _imageView2;
+}
+
 -(UIImageView *)imageView1
 {
     if (!_imageView1) {
@@ -89,14 +100,14 @@
     return _btn;
 }
 
--(CALayer *)layer
+-(CALayer *)mylayer
 {
-    if (!_layer) {
-        _layer = [CALayer layer];
-        _layer.anchorPoint = CGPointZero;
-        [self.view.layer addSublayer:_layer];
+    if (!_mylayer) {
+        _mylayer = [CALayer layer];
+        _mylayer.anchorPoint = CGPointZero;
+        [self.view.layer addSublayer:_mylayer];
     }
-    return _layer;
+    return _mylayer;
 }
 
 - (void)viewDidLoad {
@@ -104,9 +115,9 @@
     
     self.view.backgroundColor = [UIColor whiteColor];
     
-    self.layer.bounds = CGRectMake(0, 0, 100, 100);
-    self.layer.position = CGPointMake(100, 100);
-    self.layer.backgroundColor = [UIColor orangeColor].CGColor;
+    self.mylayer.bounds = CGRectMake(0, 0, 100, 100);
+    self.mylayer.position = CGPointMake(100, 100);
+    self.mylayer.backgroundColor = [UIColor orangeColor].CGColor;
 
     [self.btn setTitle:@"点击" forState:UIControlStateNormal];
     [self.btn setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
@@ -116,6 +127,8 @@
     self.imageView.image = [UIImage imageNamed:@"me"];
     
     self.imageView1.image = [UIImage imageNamed:@"1.jpg"];
+    
+    self.imageView2.image = [UIImage imageNamed:@"2.jpg"];
     
     
     [self.btn_left setTitle:@"左" forState:UIControlStateNormal];
@@ -196,8 +209,35 @@
     
     
     /***分隔线***/
+    
     //组动画
+//    [self CAAnimationGroupShow];
+    
+    /***分隔线***/
+    
+    //UIVie动画w和核心动画的一些区别
+    [self differentBetweenUIviewAndCALayer];
+    
+}
+
+
+/**UIView动画和核心动画的一些区别*/
+-(void)differentBetweenUIviewAndCALayer
+{
+    //这里的self.imageView.center变化了
+    [UIView animateWithDuration:2.0 animations:^{
+       NSLog(@"doAnimation before: %@",NSStringFromCGPoint(self.imageView.center));
+        self.imageView.center = CGPointMake(300, 300);
+        [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromRight forView:self.view cache:YES];
+    } completion:^(BOOL finished) {
+        NSLog(@"doAnimation after: %@",NSStringFromCGPoint(self.imageView.center));
+    }];
+    
+    
+    //可以发现，self.imageView2.center根本就没有变化
+    NSLog(@"doCoreAnimation before: %@",NSStringFromCGPoint(self.imageView2.center));
     [self CAAnimationGroupShow];
+    NSLog(@"doCoreAnimation after: %@",NSStringFromCGPoint(self.imageView2.center));
     
 }
 
@@ -223,7 +263,7 @@
     group.duration = 2.0;
     group.animations = @[basci,basic1,basic2];
     
-    [self.imageView.layer addAnimation:group forKey:nil];
+    [self.imageView2.layer addAnimation:group forKey:nil];
 
 }
 
@@ -297,7 +337,7 @@
     keyframe.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
     keyframe.duration = 2.0;
     keyframe.values = @[v1,v2,v3,v4,v5];
-    [self.layer addAnimation:keyframe forKey:nil];
+    [self.mylayer addAnimation:keyframe forKey:nil];
 }
 
 -(void)animationDidStart:(CAAnimation *)anim
@@ -319,7 +359,7 @@
     basic.duration = 2.0;
     basic.fromValue = @(0);
     basic.toValue = @(1);
-    [self.layer addAnimation:basic forKey:nil];
+    [self.mylayer addAnimation:basic forKey:nil];
 }
 
 /**CABasicAnimation的transform演示*/
@@ -333,7 +373,7 @@
 //    basic.toValue = [NSValue valueWithCATransform3D:CATransform3DMakeRotation(M_PI_4, 1, 1, 0)];
     basic.toValue = @(2);
     
-    [self.layer addAnimation:basic forKey:nil];
+    [self.mylayer addAnimation:basic forKey:nil];
 }
 
 /**CABasicAnimation的bounds演示*/
@@ -346,7 +386,7 @@
 //    basic.toValue = [NSValue valueWithCGRect:CGRectMake(0, 0, 200, 200)];
     //byValue是在原来的基础上增加多少
     basic.byValue = [NSValue valueWithCGRect:CGRectMake(0, 0, 200, 200)];
-    [self.layer addAnimation:basic forKey:nil];
+    [self.mylayer addAnimation:basic forKey:nil];
 }
 
 
@@ -376,7 +416,7 @@
     basic.fillMode = kCAFillModeForwards;
     
     //2.添加核心动画到layer
-    [self.layer addAnimation:basic forKey:nil];
+    [self.mylayer addAnimation:basic forKey:nil];
 }
 
 @end
